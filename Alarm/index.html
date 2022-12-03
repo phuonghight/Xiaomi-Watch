@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alarm Clock</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+        integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <div class="main">
+        <div class="list">
+            <!-- <div class="section">
+                <div class="time">00:00</div>
+                <div class="onBtn">
+                    <div class="circle"></div>
+                </div>
+            </div>
+            <div class="section">
+                <div class="time">00:00</div>
+                <div class="onBtn">
+                    <div class="circle"></div>
+                </div>
+            </div>
+            <div class="section">
+                <div class="time">00:00</div>
+                <div class="onBtn">
+                    <div class="circle"></div>
+                </div>
+            </div> -->
+        </div>
+        <div class="insertBtn">
+            <i class="fa-solid fa-plus"></i>
+        </div>
+    </div>
+
+    <!-- Page insert Alarm -->
+    <div class="insertAlarmPage hide">
+        <div class="header">
+            <i class="fa-solid fa-xmark close"></i>
+            <div class="title">
+                <div class="h3">Thêm báo thức</div>
+                <div class="timming">Báo thức sau 00 giờ 00 phút</div>
+            </div>
+            <i class="fa-solid fa-check check"></i>
+        </div>
+        <div class="choeseTime">
+            <input type="number" class="hour hourInsert" onKeyDown="limitText(this,2);" onKeyUp="limitText(this,2);"
+                value="00">
+            :
+            <input type="number" class="min minInsert" onKeyDown="limitText(this,2);" onKeyUp="limitText(this,2);"
+                value="00">
+        </div>
+        <div class="options">
+            <div class="option_item music">
+                <div class="option_title">Nhạc chuông</div>
+                <div class="music-option">
+                    <span class="suggestion">Nhạc chuông mặc định</span>
+                    <i class="fa-solid fa-angle-right"></i>
+                </div>
+            </div>
+            <div class="option_item repeat">
+                <div class="option_title">Lặp lại</div>
+                <div class="repeat-option">
+                    <span class="suggestion">Một lần</span>
+                    <i class="fa-solid fa-angle-right"></i>
+                </div>
+            </div>
+            <div class="option_item vibrate">
+                <div class="option_title">Rung khi báo thức</div>
+                <div class="onBtn">
+                    <div class="circle"></div>
+                </div>
+            </div>
+            <div class="option_item delete-after-alarm">
+                <div class="option_title">Xóa sau khi đã báo thức</div>
+                <div class="onBtn">
+                    <div class="circle"></div>
+                </div>
+            </div>
+            <div class="option_item lable-alarm">
+                <div class="option_title">Nhãn</div>
+                <div class="lable-alarm-option">
+                    <i class="fa-solid fa-angle-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Fix Alarm -->
+    <div class="fix-alarm hide">
+        <!-- <div class="header">
+            <div class="header--left">
+                <div class="header__time h3">00:00</div>
+                <div class="timming">Báo thức sau 00 giờ 00 phút</div>
+            </div>
+
+            <div class="onFixBtn">
+                <div class="FixBtn__circle"></div>
+            </div>
+        </div>
+        <div class="choeseTime fix-alarm__choeseTime">
+            <input type="number" class="hour hourFix" onKeyDown="limitText(this,2);" onKeyUp="limitText(this,2);"
+                value="00">
+            :
+            <input type="number" class="min minFix" onKeyDown="limitText(this,2);" onKeyUp="limitText(this,2);"
+                value="00">
+        </div>
+        <div class="fix-alarm__btns">
+            <div class="fixAdditional fix-alarm__btn">Cài đặt bổ sung</div>
+            <div class="fixDoneBtn fix-alarm__btn">Hoàn tất</div>
+        </div> -->
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay hide"></div>
+
+    <!-- Page Fix Additional -->
+    <div class="fixAdditionalPage hide">
+        <!-- <div class="header">
+            <i class="fa-solid fa-xmark close-fixAdditionalPage"></i>
+            <div class="title">
+                <div class="h3">Thêm báo thức</div>
+                <div class="timming">Báo thức sau 00 giờ 00 phút</div>
+            </div>
+            <i class="fa-solid fa-check check-fixAdditionalPage"></i>
+        </div>
+        <div class="choeseTime">
+            <input type="number" class="hour hourInsert" onKeyDown="limitText(this,2);" onKeyUp="limitText(this,2);"
+                value="00">
+            :
+            <input type="number" class="min minInsert" onKeyDown="limitText(this,2);" onKeyUp="limitText(this,2);"
+                value="00">
+        </div>
+        <div class="options">
+            <div class="option_item music">
+                <div class="option_title">Nhạc chuông</div>
+                <div class="music-option">
+                    <span class="suggestion">Nhạc chuông mặc định</span>
+                    <i class="fa-solid fa-angle-right"></i>
+                </div>
+            </div>
+            <div class="option_item repeat">
+                <div class="option_title">Lặp lại</div>
+                <div class="repeat-option">
+                    <span class="suggestion">Một lần</span>
+                    <i class="fa-solid fa-angle-right"></i>
+                </div>
+            </div>
+            <div class="option_item vibrate">
+                <div class="option_title">Rung khi báo thức</div>
+                <div class="onBtn">
+                    <div class="circle"></div>
+                </div>
+            </div>
+            <div class="option_item delete-after-alarm">
+                <div class="option_title">Xóa sau khi đã báo thức</div>
+                <div class="onBtn">
+                    <div class="circle"></div>
+                </div>
+            </div>
+            <div class="option_item lable-alarm">
+                <div class="option_title">Nhãn</div>
+                <div class="lable-alarm-option">
+                    <i class="fa-solid fa-angle-right"></i>
+                </div>
+            </div>
+            <div class="abc">
+                <div class="delete-alarm">Xóa</div>
+            </div>
+        </div> -->
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
