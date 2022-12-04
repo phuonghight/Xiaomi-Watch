@@ -17,32 +17,23 @@ const insertBtn = $('.insertBtn');
 const main = $('.main');
 const insertAlarmPage = $('.insertAlarmPage');
 
-const closeInsert = $('.close');
-const checkBtn = $('.check');
-
-const hourInsert = $('.hourInsert');
-const minInsert = $('.minInsert');
-
 const timming = $('.timming');
 
 class Alarm {
-  id;
-  min;
-  hour;
-  isActive;
-  isRepeat;
-
-  constructor(hour, min, isActive = true, isRepeat = false) {
+  constructor(id, hour, min, isActive = true, isRepeat = false, label = '') {
+    this.id = id;
     this.min = min;
     this.hour = hour;
     this.isActive = isActive;
     this.isRepeat = isRepeat;
+    this.label = label;
   }
 }
 
 class App {
   #listAlarm = [];
 
+  timeDisplayNotify = 60;
   curIndex;
   check;
 
@@ -61,10 +52,22 @@ class App {
     'Dec',
   ];
 
+  day = [
+    'Chủ Nhật',
+    'Thứ Hai',
+    'Thứ Ba',
+    'Thứ Tư',
+    'Thứ Năm',
+    'Thứ Sáu',
+    'Thứ Bảy',
+  ];
+
   constructor() {
     this._getLocalStorage();
 
     this._handleEvents();
+
+    this._notification();
   }
 
   ////////////////////////
@@ -72,11 +75,9 @@ class App {
   _handleEvents() {
     insertBtn.addEventListener('click', this._displayInsertPage.bind(this));
 
-    closeInsert.addEventListener('click', this._hideInsertPage);
-
-    checkBtn.addEventListener('click', this._addAlarm.bind(this));
-
     overlay.addEventListener('click', this._hideFixAlarm);
+
+    overlay.addEventListener('click', this._hideInputLabelPage);
 
     document.addEventListener(
       'click',
@@ -89,8 +90,14 @@ class App {
           const btnEl = e.target.closest('.onBtn');
           btnEl.classList.toggle('active');
           const section = btnEl.parentElement;
+          section.classList.toggle('active');
           this._changeActive(section);
           this._setLocalStorage();
+        }
+
+        // hide notification page
+        else if (e.target.classList.contains('close-noti')) {
+          this._hideNotifiPage();
         }
       }.bind(this)
     );
@@ -126,6 +133,16 @@ class App {
           if (!btnEl) return;
           btnEl.classList.toggle('active');
           this.check = !this.check;
+        }
+
+        // close insert page
+        else if (e.target.classList.contains('close')) {
+          this._hideInsertPage();
+        }
+
+        // check insert page
+        else if (e.target.classList.contains('check')) {
+          this._addAlarm();
         }
 
         // install fix alarm
@@ -167,31 +184,33 @@ class App {
 
           this._hideFixAdditionPage();
         }
-      }.bind(this)
-    );
 
-    $$('input').forEach(
-      function (input) {
-        // input.onchange = this._inputOnChange();
-        input.addEventListener('change', this._inputOnChange.bind(this));
+        // input label alarm
+        else if (e.target.classList.contains('lable-alarm')) {
+          this._displayInputLabelPage();
+        }
+
+        //
+        else if (e.target.classList.contains('cancel')) {
+          this._hideInputLabelPage();
+        }
+
+        // install label alarm
+        else if (e.target.classList.contains('install')) {
+          this._hideInputLabelPage();
+          alert('Tính năng này tôi chưa code =))');
+        }
       }.bind(this)
     );
 
     document.addEventListener(
-      'change',
+      'input',
       function (e) {
         if (
           e.target.classList.contains('hourFix') ||
           e.target.classList.contains('minFix')
         ) {
-          $('.fix-alarm__timming').textContent = this._calTime(
-            new Date(),
-            this._creatFuture(
-              new Date(),
-              $('.hourFix').value,
-              $('.minFix').value
-            )
-          );
+          this._inputOnChange('hourFix', 'minFix', $('.fix-alarm__timming'));
 
           $('.header__time').textContent = `${$('.hourFix').value}:${
             $('.minFix').value
@@ -200,14 +219,16 @@ class App {
           e.target.classList.contains('hourFixAddition') ||
           e.target.classList.contains('minFixAddition')
         ) {
-          $('.fix-addition__timming').textContent = this._calTime(
-            new Date(),
-            this._creatFuture(
-              new Date(),
-              $('.hourFixAddition').value,
-              $('.minFixAddition').value
-            )
+          this._inputOnChange(
+            'hourFixAddition',
+            'minFixAddition',
+            $('.fix-addition__timming')
           );
+        } else if (
+          e.target.classList.contains('hourInsert') ||
+          e.target.classList.contains('minInsert')
+        ) {
+          this._inputOnChange('hourInsert', 'minInsert', $('.timming'));
         }
       }.bind(this)
     );
@@ -216,19 +237,87 @@ class App {
   ////////////////////////
   // UI
   _displayInsertPage(e) {
+    const html = `<div class="header">
+    <i class="fa-solid fa-xmark close"></i>
+    <div class="title">
+        <div class="h3">Thêm báo thức</div>
+        <div class="timming"></div>
+    </div>
+    <i class="fa-solid fa-check check"></i>
+</div>
+<div class="choeseTime">
+    <input type="number" class="hour hourInsert" onKeyDown="limitText(this,2);" onKeyUp="limitText(this,2);"
+        value="${`${new Date().getHours()}`.padStart(2, 0)}" min="0" max="23">
+    :
+    <input type="number" class="min minInsert" onKeyDown="limitText(this,2);" onKeyUp="limitText(this,2);"
+        value="${`${new Date().getMinutes()}`.padStart(2, 0)}" min="0" max="59">
+</div>
+<div class="options">
+    <div class="option_item music">
+        <div class="option_title">Nhạc chuông</div>
+        <div class="music-option">
+            <span class="suggestion">Nhạc chuông mặc định</span>
+            <i class="fa-solid fa-angle-right"></i>
+        </div>
+    </div>
+    <div class="option_item repeat">
+        <div class="option_title">Lặp lại</div>
+        <div class="repeat-option">
+            <span class="suggestion">Một lần</span>
+            <i class="fa-solid fa-angle-right"></i>
+        </div>
+    </div>
+    <div class="option_item vibrate">
+        <div class="option_title">Rung khi báo thức</div>
+        <div class="onBtn">
+            <div class="circle"></div>
+        </div>
+    </div>
+    <div class="option_item delete-after-alarm">
+        <div class="option_title">Xóa sau khi đã báo thức</div>
+        <div class="onBtn">
+            <div class="circle"></div>
+        </div>
+    </div>
+    <div class="option_item lable-alarm">
+        <div class="option_title">Nhãn</div>
+        <div class="lable-alarm-option">
+            <i class="fa-solid fa-angle-right"></i>
+        </div>
+    </div>
+</div>
+<div class="inputLabelPage hide">
+            <div class="inputLabelPage__header">Thêm nhãn báo thức</div>
+            <input type="text" placeholder="Nhập nhãn" id="label-alarm">
+            <div class="buttons">
+                <div class="label__btn cancel">Hủy</div>
+                <div class="label__btn install">OK</div>
+            </div>
+        </div>`;
+
     main.classList.add('hide');
+    insertAlarmPage.innerHTML = html;
+
+    $('.timming').textContent = this._calTime(
+      new Date(),
+      this._creatFuture(
+        new Date(),
+        $('.hourInsert').value,
+        $('.minInsert').value
+      )
+    );
+
     insertAlarmPage.classList.remove('hide');
-    hourInsert.value = `${new Date().getHours()}`.padStart(2, 0);
-    minInsert.value = `${new Date().getHours()}`.padStart(2, 0);
   }
 
-  _hideInsertPage(e) {
-    main.classList.remove('hide');
+  _hideInsertPage() {
+    insertAlarmPage.innerHTML = '';
     insertAlarmPage.classList.add('hide');
+    main.classList.remove('hide');
   }
 
   _displayFixAdditionalPage(alarm) {
-    const html = ` <div class="header">
+    const html = `<div class="header">
     <i class="fa-solid fa-xmark close-fixAdditionalPage"></i>
     <div class="title">
         <div class="h3">Thêm báo thức</div>
@@ -241,10 +330,10 @@ class App {
 </div>
 <div class="choeseTime">
     <input type="number" class="hour hourFixAddition" onKeyDown="limitText(this,2);" onKeyUp="limitText(this,2);"
-        value="${alarm.hour.padStart(2, 0)}">
+        value="${alarm.hour.padStart(2, 0)}" min="0" max="23">
     :
     <input type="number" class="min minFixAddition" onKeyDown="limitText(this,2);" onKeyUp="limitText(this,2);"
-        value="${alarm.min.padStart(2, 0)}">
+        value="${alarm.min.padStart(2, 0)}" min="0" max="59">
 </div>
 <div class="options">
     <div class="option_item music">
@@ -282,14 +371,22 @@ class App {
     <div class="abc">
         <div class="delete-alarm">Xóa</div>
     </div>
-</div>`;
+</div>
+<div class="inputLabelPage hide">
+            <div class="inputLabelPage__header">Thêm nhãn báo thức</div>
+            <input type="text" placeholder="Nhập nhãn" id="label-alarm">
+            <div class="buttons">
+                <div class="label__btn cancel">Hủy</div>
+                <div class="label__btn install">OK</div>
+            </div>
+        </div>`;
 
     $('.fixAdditionalPage').innerHTML = html;
     $('.fixAdditionalPage').classList.remove('hide');
 
     fixAlarm.classList.add('hide');
     main.classList.add('hide');
-    overlay.style.display = 'none';
+    overlay.classList.add('hide');
   }
 
   _hideFixAdditionPage() {
@@ -299,28 +396,44 @@ class App {
   }
 
   _addAlarm(e) {
-    this._hideInsertPage();
-
-    const alarm = new Alarm(hourInsert.value, minInsert.value);
-    alarm.id = this.#listAlarm.length;
+    const alarm = new Alarm(
+      this.#listAlarm.length,
+      $('.hourInsert').value,
+      $('.minInsert').value
+    );
 
     // insertAlarm(alarm);
     this.#listAlarm.push(alarm);
     this._setLocalStorage();
 
+    this._hideInsertPage();
     this._updateUI();
   }
 
   _updateUI() {
     listHTML.innerHTML = '';
+
+    this._sortListAlarm();
+
     this.#listAlarm.forEach(alarm => {
       this._displayAlarm(alarm);
     });
   }
 
+  _sortListAlarm() {
+    this.#listAlarm.sort((a, b) => {
+      if (+a.hour === +b.hour) return +a.min - +b.min;
+      return +a.hour - +b.hour;
+    });
+
+    this.#listAlarm.forEach((alarm, index) => (alarm.id = index));
+  }
+
   _displayAlarm(alarm) {
     const active = alarm.isActive ? 'active' : '';
-    const html = `<div class="section" draggable="true" data='${alarm.id}'>
+    const html = `<div class="section ${active}" draggable="true" data='${
+      alarm.id
+    }'>
         <div class="time">${alarm.hour.padStart(2, 0)}:${alarm.min.padStart(
       2,
       0
@@ -352,10 +465,10 @@ class App {
           </div>
           <div class="choeseTime fix-alarm__choeseTime">
               <input type="number" class="hour hourFix" onKeyDown="limitText(this,2);" onKeyUp="limitText(this,2);"
-                  value="${alarm.hour.padStart(2, 0)}">
+                  value="${alarm.hour.padStart(2, 0)}" min="0" max="23">
               :
               <input type="number" class="min minFix" onKeyDown="limitText(this,2);" onKeyUp="limitText(this,2);"
-                  value="${alarm.min.padStart(2, 0)}">
+                  value="${alarm.min.padStart(2, 0)}" min="0" max="59">
           </div>
           <div class="fix-alarm__btns">
               <div class="fixAdditional fix-alarm__btn">Cài đặt bổ sung</div>
@@ -366,13 +479,60 @@ class App {
     fixAlarm.innerHTML = html;
 
     fixAlarm.classList.remove('hide');
-    overlay.style.display = 'block';
+    overlay.classList.remove('hide');
   }
 
   _hideFixAlarm() {
     fixAlarm.classList.add('hide');
     fixAlarm.innerHTML = '';
-    overlay.style.display = 'none';
+    overlay.classList.add('hide');
+  }
+
+  _displayNotifiPage(alarm) {
+    const now = new Date();
+    const date = now.getDate();
+    const month = now.getMonth() + 1;
+    const day = this.day[now.getDay()];
+    const html = `<audio class="sound" autoplay src="../Alarm/bell.mp3" loop></audio>
+    <div class="notification__header">
+    <div class="time">${alarm.hour}:${alarm.min}</div>
+    <div class="date">${date} tháng ${month} ${day}</div>
+</div>
+
+<div class="circle__repeat">Báo lại sau 10 phút</div>
+
+<div class="close-noti">Chạm để tắt</div>`;
+    $('.notification').insertAdjacentHTML('afterbegin', html);
+    $('.notification').classList.add('active');
+
+    setTimeout(this._hideNotifiPage, this.timeDisplayNotify * 1000);
+  }
+
+  _hideNotifiPage() {
+    $('.notification').innerHTML = '';
+    $('.notification').classList.remove('active');
+
+    let sec = new Date().getSeconds(); // vi du la 10s
+    setInterval(
+      function () {
+        sec++;
+        if (sec === 59) {
+          this._notification();
+          return;
+        }
+      }.bind(this),
+      1000
+    );
+  }
+
+  _displayInputLabelPage() {
+    $('.inputLabelPage').classList.remove('hide');
+    overlay.classList.remove('hide');
+  }
+
+  _hideInputLabelPage() {
+    $('.inputLabelPage').classList.add('hide');
+    overlay.classList.add('hide');
   }
 
   ////////////////////////
@@ -432,10 +592,11 @@ class App {
         );
   }
 
-  _inputOnChange() {
+  _inputOnChange(hour, min, timming) {
+    this._limitValueInput($(`.${hour}`), $(`.${min}`));
     timming.textContent = this._calTime(
       new Date(),
-      this._creatFuture(new Date(), +hourInsert.value, +minInsert.value)
+      this._creatFuture(new Date(), +$(`.${hour}`).value, +$(`.${min}`).value)
     );
   }
 
@@ -458,6 +619,46 @@ class App {
     this._setLocalStorage();
     this._updateUI();
   }
+
+  _limitValueInput(hour, min) {
+    min.value = +min.value > +min.getAttribute('max') ? 59 : min.value;
+    hour.value = +hour.value > +hour.getAttribute('max') ? 23 : hour.value;
+
+    min.value = +min.value < +min.getAttribute('min') ? 0 : min.value;
+    hour.value = +hour.value < +hour.getAttribute('min') ? 0 : hour.value;
+  }
+
+  _checkTime(list = this.#listAlarm) {
+    const trueAlarm = list.find(alarm => {
+      const now = new Date();
+      return (
+        alarm.isActive &&
+        +alarm.hour === now.getHours() &&
+        +alarm.min === now.getMinutes()
+      );
+    });
+    return trueAlarm || undefined;
+  }
+
+  _notification() {
+    const interval = setInterval(
+      function () {
+        const trueAlarm = this._checkTime();
+        if (trueAlarm) {
+          if (!trueAlarm.isRepeat) {
+            const id = trueAlarm.id;
+            this.#listAlarm[id].isActive = false;
+            this._updateUI();
+          }
+          this._displayNotifiPage(trueAlarm);
+          clearInterval(interval);
+        }
+      }.bind(this),
+      1000
+    );
+  }
+
+  _addLabel() {}
 
   ///////////////////
   // Save on Local Storage

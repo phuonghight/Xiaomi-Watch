@@ -1,4 +1,5 @@
-@import 'https://fonts.googleapis.com/css2?family=Roboto&display=swap';
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -35,6 +36,8 @@ body {
 
 .list {
   width: 100%;
+  height: 83vh;
+  overflow-y: scroll;
 }
 
 .section {
@@ -44,6 +47,14 @@ body {
   align-items: center;
   padding: 2rem;
   transition: 0.1s;
+}
+
+.section.active .time {
+  color: black;
+}
+
+.section .time {
+  color: #c8c8c8;
 }
 
 .section:active {
@@ -114,6 +125,7 @@ body {
   flex-direction: column;
   /* justify-content: space-between; */
   display: block;
+  position: relative;
 }
 
 .insertAlarmPage.hide {
@@ -182,16 +194,17 @@ input {
   text-align: center;
 }
 
-.options {
-  padding: 0 2rem;
-}
-
 .option_item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 2rem 0;
+  padding: 2rem;
 }
+
+.option_item:active {
+  background-color: #c8c8c8;
+}
+
 .option_title {
   font-size: 2rem;
   font-weight: bold;
@@ -207,6 +220,80 @@ input {
   font-size: 2rem;
 }
 
+.inputLabelPage.hide {
+  display: none;
+}
+.inputLabelPage {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 25vh;
+  background-color: white;
+  padding: 0 3rem;
+  border-top-left-radius: 3rem;
+  border-top-right-radius: 3rem;
+  z-index: 1000;
+}
+
+.inputLabelPage__header {
+  padding: 1.5rem 0;
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+#label-alarm {
+  flex: 1;
+  width: 100%;
+  height: 5rem;
+  border-radius: 1.5rem;
+  background-color: #f1f1f1;
+  text-align: left;
+  font-size: 2rem;
+  padding-left: 2rem;
+}
+
+#label-alarm:focus {
+  border: 3px solid #0d84ff;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1.5rem 0;
+}
+
+.label__btn {
+  width: 48%;
+  font-size: 2rem;
+  font-weight: 500;
+  padding: 1.5rem 0;
+  border-radius: 100rem;
+  text-align: center;
+}
+
+.install {
+  background-color: #0d84ff;
+  color: white;
+}
+
+.install:active {
+  background-color: #3b9dff;
+}
+
+.cancel {
+  background-color: #f1f1f1;
+}
+
+.cancel:active {
+  background-color: #d8d8d8;
+}
 /* Fix Alarm Page */
 
 .fix-alarm.hide {
@@ -280,6 +367,7 @@ input {
   right: 0;
   bottom: 0;
   background-color: rgb(0, 0, 0, 0.3);
+  z-index: 100;
 }
 .overlay.hide {
   display: none;
@@ -291,6 +379,7 @@ input {
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .fixAdditionalPage.hide {
@@ -312,4 +401,58 @@ input {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* Notification Page */
+.notification {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #2e3b43;
+  color: white;
+  font-size: 2rem;
+  font-weight: 200;
+  z-index: 1000;
+  display: none;
+}
+
+.notification.active {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.notification__header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.notification__header .time {
+  font-size: 7rem;
+}
+
+.circle__repeat {
+  background-color: #4a535c;
+  height: 20rem;
+  width: 20rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.close-noti {
+  background-color: #4a535c;
+  padding: 2rem 3rem;
+  border-radius: 1000rem;
+}
+
+.close-noti:active,
+.circle__repeat:active {
+  background-color: #677380;
 }

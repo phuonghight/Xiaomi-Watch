@@ -41,7 +41,7 @@
 
     <!-- Page insert Alarm -->
     <div class="insertAlarmPage hide">
-        <div class="header">
+        <!-- <div class="header">
             <i class="fa-solid fa-xmark close"></i>
             <div class="title">
                 <div class="h3">Thêm báo thức</div>
@@ -51,10 +51,10 @@
         </div>
         <div class="choeseTime">
             <input type="number" class="hour hourInsert" onKeyDown="limitText(this,2);" onKeyUp="limitText(this,2);"
-                value="00">
+                value="00" min="0" max="23">
             :
             <input type="number" class="min minInsert" onKeyDown="limitText(this,2);" onKeyUp="limitText(this,2);"
-                value="00">
+                value="00" min="0" max="59">
         </div>
         <div class="options">
             <div class="option_item music">
@@ -90,6 +90,15 @@
                 </div>
             </div>
         </div>
+
+        <div class="inputLabelPage hide">
+            <div class="inputLabelPage__header">Thêm nhãn báo thức</div>
+            <input type="text" placeholder="Nhập nhãn" id="label-alarm">
+            <div class="buttons">
+                <div class="label__btn cancel">Hủy</div>
+                <div class="label__btn install">OK</div>
+            </div>
+        </div> -->
     </div>
 
     <!-- Page Fix Alarm -->
@@ -173,7 +182,28 @@
             <div class="abc">
                 <div class="delete-alarm">Xóa</div>
             </div>
+        </div>
+        <div class="inputLabelPage hide">
+            <div class="inputLabelPage__header">Thêm nhãn báo thức</div>
+            <input type="text" placeholder="Nhập nhãn" id="label-alarm">
+            <div class="buttons">
+                <div class="label__btn cancel">Hủy</div>
+                <div class="label__btn install">OK</div>
+            </div>
         </div> -->
+    </div>
+
+    <!-- Notification Page -->
+    <div class="notification">
+        <!-- <audio class="sound" src="../Alarm/bell.mp3" loop></audio>
+        <div class="notification__header">
+            <div class="time">00:00</div>
+            <div class="date">04 tháng 12 Chủ Nhật</div>
+        </div>
+
+        <div class="circle__repeat">Báo lại sau 10 phút</div>
+
+        <div class="close-noti">Chạm để tắt</div> -->
     </div>
 
     <script src="script.js"></script>
