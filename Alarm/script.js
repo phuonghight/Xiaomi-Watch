@@ -493,7 +493,8 @@ class App {
     const date = now.getDate();
     const month = now.getMonth() + 1;
     const day = this.day[now.getDay()];
-    const html = `<audio class="sound" autoplay src="../Alarm/bell.mp3" loop></audio>
+    const html = `
+    <audio class="sound" src="./bell.mp3" autoplay loop></audio>
     <div class="notification__header">
     <div class="time">${alarm.hour}:${alarm.min}</div>
     <div class="date">${date} tháng ${month} ${day}</div>
@@ -504,8 +505,9 @@ class App {
 <div class="close-noti">Chạm để tắt</div>`;
     $('.notification').insertAdjacentHTML('afterbegin', html);
     $('.notification').classList.add('active');
+    $('.sound').setAttribute('autoplay');
 
-    setTimeout(this._hideNotifiPage, this.timeDisplayNotify * 1000);
+    setTimeout(this._hideNotifiPage.bind(this), this.timeDisplayNotify * 1000);
   }
 
   _hideNotifiPage() {
