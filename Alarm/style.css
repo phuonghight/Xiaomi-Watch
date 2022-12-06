@@ -16,6 +16,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .main {
@@ -62,8 +64,25 @@ body {
 }
 
 .time {
+  line-height: 3rem;
   font-size: 3rem;
+  position: relative;
 }
+
+.time::before {
+  content: attr(data-label); /*Quan trọng*/
+  max-height: 1.5rem;
+  position: absolute;
+  bottom: 0;
+  left: calc(100% + 1rem);
+  line-height: 1.5rem;
+  font-size: 1.5rem;
+  width: 250%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
 .onBtn,
 .onFixBtn {
   padding: 1.5rem 3rem;
@@ -119,17 +138,41 @@ body {
 /* Page insert Alarm */
 
 .insertAlarmPage {
+  background-color: white;
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  /* justify-content: space-between; */
-  display: block;
   position: relative;
+  animation: fadeInX 0.2s ease-in-out;
+  overflow: hidden;
 }
 
 .insertAlarmPage.hide {
+  animation: fadeOutX 0.2s ease-in-out;
   display: none;
+}
+
+@keyframes fadeInX {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeOutX {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
 }
 
 .header {
@@ -221,8 +264,9 @@ input {
 }
 
 .inputLabelPage.hide {
-  display: none;
+  transform: translateY(100%);
 }
+
 .inputLabelPage {
   display: flex;
   flex-direction: column;
@@ -238,6 +282,7 @@ input {
   border-top-left-radius: 3rem;
   border-top-right-radius: 3rem;
   z-index: 1000;
+  transition: 0.2s;
 }
 
 .inputLabelPage__header {
@@ -278,12 +323,14 @@ input {
   text-align: center;
 }
 
-.install {
+.install,
+.addition-install {
   background-color: #0d84ff;
   color: white;
 }
 
-.install:active {
+.install:active,
+.addition-install:active {
   background-color: #3b9dff;
 }
 
@@ -297,7 +344,8 @@ input {
 /* Fix Alarm Page */
 
 .fix-alarm.hide {
-  display: none;
+  opacity: 0;
+  transform: scale(0);
 }
 
 .fix-alarm {
@@ -307,11 +355,13 @@ input {
   right: 1rem;
   border-radius: 1rem;
   background-color: rgb(255, 255, 255);
-  transform: translate(0, -50%);
+  transform: translate(0, -50%) scale(1);
   display: flex;
   flex-direction: column;
   align-items: center;
   z-index: 1000;
+  opacity: 1;
+  transition: 0.2s;
 }
 
 .header {
@@ -368,6 +418,7 @@ input {
   bottom: 0;
   background-color: rgb(0, 0, 0, 0.3);
   z-index: 100;
+  transition: 0.2s;
 }
 .overlay.hide {
   display: none;
@@ -380,10 +431,13 @@ input {
   display: flex;
   flex-direction: column;
   position: relative;
+  animation: fadeInX 0.2s ease-in-out;
+  overflow: hidden;
 }
 
 .fixAdditionalPage.hide {
   display: none;
+  animation: fadeOutX 0.2s ease-in-out;
 }
 
 .delete-alarm {
@@ -432,8 +486,23 @@ input {
   align-items: center;
 }
 
-.notification__header .time {
+.notify-time {
   font-size: 7rem;
+  position: relative;
+}
+
+.notify-time::before {
+  content: attr(data-label);
+  text-align: center;
+  width: 200%;
+  font-size: 2rem;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .circle__repeat {

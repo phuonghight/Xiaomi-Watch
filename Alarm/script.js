@@ -35,6 +35,7 @@ class App {
 
   timeDisplayNotify = 60;
   curIndex;
+  curLabel = '';
   check;
 
   month = [
@@ -138,11 +139,13 @@ class App {
         // close insert page
         else if (e.target.classList.contains('close')) {
           this._hideInsertPage();
+          this.curLabel = '';
         }
 
-        // check insert page
+        // check/install insert page
         else if (e.target.classList.contains('check')) {
           this._addAlarm();
+          this.curLabel = '';
         }
 
         // install fix alarm
@@ -165,11 +168,13 @@ class App {
         // close fix addition page
         else if (e.target.classList.contains('close-fixAdditionalPage')) {
           this._hideFixAdditionPage();
+          this.curLabel = '';
         }
 
         // delete alarm
         else if (e.target.classList.contains('delete-alarm')) {
           this._deleteAlarm(this.curIndex);
+          this.curLabel = '';
 
           this._hideFixAdditionPage();
         }
@@ -179,26 +184,55 @@ class App {
           this._installFixAddition(
             this.curIndex,
             $('.hourFixAddition').value,
-            $('.minFixAddition').value
+            $('.minFixAddition').value,
+            false,
+            this.curLabel
           );
+          this.curLabel = '';
 
           this._hideFixAdditionPage();
         }
 
-        // input label alarm
-        else if (e.target.classList.contains('lable-alarm')) {
-          this._displayInputLabelPage();
-        }
-
-        //
+        // hide input label alarm in both insert and fix addition page
         else if (e.target.classList.contains('cancel')) {
           this._hideInputLabelPage();
         }
 
-        // install label alarm
+        // display input alarm in insert page
+        else if (e.target.classList.contains('label-alarm')) {
+          this._displayInputLabelPage();
+        }
+
+        // install label alarm in insert page
         else if (e.target.classList.contains('install')) {
           this._hideInputLabelPage();
-          alert('Tính năng này tôi chưa code =))');
+          this._updateCurLabel();
+        }
+
+        // display input alarm in fix addition page
+        else if (e.target.classList.contains('addition-label-alarm')) {
+          this._displayInputLabelPage(this.#listAlarm[this.curIndex]);
+        }
+
+        // install label alarm in fix addition page
+        else if (e.target.classList.contains('addition-install')) {
+          this._hideInputLabelPage();
+          this._updateCurLabel();
+        }
+
+        // repeat after 10 minutes
+        else if (e.target.classList.contains('circle__repeat')) {
+          alert('Tính năng này tôi chưa code :((');
+        }
+
+        // repeat option in insert page
+        else if (e.target.classList.contains('repeat')) {
+          alert('Tính năng này tôi chưa code :((');
+        }
+
+        // music option in insert page
+        else if (e.target.classList.contains('music')) {
+          alert('Tính năng này coi như không có :((');
         }
       }.bind(this)
     );
@@ -235,7 +269,8 @@ class App {
   }
 
   ////////////////////////
-  // UI
+
+  // UI with insert alarm page
   _displayInsertPage(e) {
     const html = `<div class="header">
     <i class="fa-solid fa-xmark close"></i>
@@ -279,7 +314,7 @@ class App {
             <div class="circle"></div>
         </div>
     </div>
-    <div class="option_item lable-alarm">
+    <div class="option_item label-alarm">
         <div class="option_title">Nhãn</div>
         <div class="lable-alarm-option">
             <i class="fa-solid fa-angle-right"></i>
@@ -316,6 +351,7 @@ class App {
     main.classList.remove('hide');
   }
 
+  // UI with fix addition alarm page
   _displayFixAdditionalPage(alarm) {
     const html = `<div class="header">
     <i class="fa-solid fa-xmark close-fixAdditionalPage"></i>
@@ -362,7 +398,7 @@ class App {
             <div class="circle"></div>
         </div>
     </div>
-    <div class="option_item lable-alarm">
+    <div class="option_item addition-label-alarm">
         <div class="option_title">Nhãn</div>
         <div class="lable-alarm-option">
             <i class="fa-solid fa-angle-right"></i>
@@ -377,7 +413,7 @@ class App {
             <input type="text" placeholder="Nhập nhãn" id="label-alarm">
             <div class="buttons">
                 <div class="label__btn cancel">Hủy</div>
-                <div class="label__btn install">OK</div>
+                <div class="label__btn addition-install">OK</div>
             </div>
         </div>`;
 
@@ -395,49 +431,16 @@ class App {
     $('.fixAdditionalPage').classList.add('hide');
   }
 
-  _addAlarm(e) {
-    const alarm = new Alarm(
-      this.#listAlarm.length,
-      $('.hourInsert').value,
-      $('.minInsert').value
-    );
-
-    // insertAlarm(alarm);
-    this.#listAlarm.push(alarm);
-    this._setLocalStorage();
-
-    this._hideInsertPage();
-    this._updateUI();
-  }
-
-  _updateUI() {
-    listHTML.innerHTML = '';
-
-    this._sortListAlarm();
-
-    this.#listAlarm.forEach(alarm => {
-      this._displayAlarm(alarm);
-    });
-  }
-
-  _sortListAlarm() {
-    this.#listAlarm.sort((a, b) => {
-      if (+a.hour === +b.hour) return +a.min - +b.min;
-      return +a.hour - +b.hour;
-    });
-
-    this.#listAlarm.forEach((alarm, index) => (alarm.id = index));
-  }
-
+  // UI with section alarm in the main UI
   _displayAlarm(alarm) {
     const active = alarm.isActive ? 'active' : '';
     const html = `<div class="section ${active}" draggable="true" data='${
       alarm.id
     }'>
-        <div class="time">${alarm.hour.padStart(2, 0)}:${alarm.min.padStart(
+        <div class="time" data-label="${alarm.label}">${alarm.hour.padStart(
       2,
       0
-    )}</div>
+    )}:${alarm.min.padStart(2, 0)}</div>
         <div class="onBtn ${active}">
             <div class="circle"></div>
         </div>
@@ -445,6 +448,7 @@ class App {
     listHTML.insertAdjacentHTML('beforeend', html);
   }
 
+  // UI with fix alarm page
   _displayFixAlarm(alarm) {
     const html = `
     <div class="header">
@@ -488,6 +492,7 @@ class App {
     overlay.classList.add('hide');
   }
 
+  // UI with notification page when in true time
   _displayNotifiPage(alarm) {
     const now = new Date();
     const date = now.getDate();
@@ -496,13 +501,14 @@ class App {
     const html = `
     <audio class="sound" src="./bell.mp3" loop></audio>
     <div class="notification__header">
-    <div class="time">${alarm.hour}:${alarm.min}</div>
+    <div class="notify-time" data-label="${alarm.label}">${alarm.hour}:${alarm.min}</div>
     <div class="date">${date} tháng ${month} ${day}</div>
 </div>
 
 <div class="circle__repeat">Báo lại sau 10 phút</div>
 
 <div class="close-noti">Chạm để tắt</div>`;
+
     $('.notification').insertAdjacentHTML('afterbegin', html);
     $('.notification').classList.add('active');
     $('.sound').play();
@@ -527,9 +533,15 @@ class App {
     );
   }
 
-  _displayInputLabelPage() {
+  // UI with label input handle
+  _displayInputLabelPage(alarm) {
     $('.inputLabelPage').classList.remove('hide');
     overlay.classList.remove('hide');
+
+    if (alarm) {
+      this.curLabel = alarm.label;
+    }
+    $('#label-alarm').value = this.curLabel;
   }
 
   _hideInputLabelPage() {
@@ -539,8 +551,46 @@ class App {
 
   ////////////////////////
   // Logic
+
   _getAlarmFromId(id) {
     return this.#listAlarm.find(alarm => alarm.id === id);
+  }
+  // some logic
+  _addAlarm(e) {
+    const alarm = new Alarm(
+      this.#listAlarm.length,
+      $('.hourInsert').value,
+      $('.minInsert').value
+    );
+
+    if (this.curLabel) {
+      alarm.label = this.curLabel;
+    }
+
+    this.#listAlarm.push(alarm);
+    this._setLocalStorage();
+
+    this._hideInsertPage();
+    this._updateUI();
+  }
+
+  _updateUI() {
+    listHTML.innerHTML = '';
+
+    this._sortListAlarm();
+
+    this.#listAlarm.forEach(alarm => {
+      this._displayAlarm(alarm);
+    });
+  }
+
+  _sortListAlarm() {
+    this.#listAlarm.sort((a, b) => {
+      if (+a.hour === +b.hour) return +a.min - +b.min;
+      return +a.hour - +b.hour;
+    });
+
+    this.#listAlarm.forEach((alarm, index) => (alarm.id = index));
   }
 
   _changeOneAlarmInList(index, hour, min, check) {
@@ -613,10 +663,11 @@ class App {
     this._updateUI();
   }
 
-  _installFixAddition(id, hour, min, isRepeat = false) {
+  _installFixAddition(id, hour, min, isRepeat = false, label = '') {
     this.#listAlarm[id].hour = hour;
     this.#listAlarm[id].min = min;
     this.#listAlarm[id].isRepeat = isRepeat;
+    this.#listAlarm[id].label = label;
 
     this._setLocalStorage();
     this._updateUI();
@@ -630,6 +681,7 @@ class App {
     hour.value = +hour.value < +hour.getAttribute('min') ? 0 : hour.value;
   }
 
+  // notification when in true time
   _checkTime(list = this.#listAlarm) {
     const trueAlarm = list.find(alarm => {
       const now = new Date();
@@ -661,7 +713,11 @@ class App {
     );
   }
 
-  _addLabel() {}
+  // label
+  _updateCurLabel() {
+    const label = $('#label-alarm').value;
+    this.curLabel = label;
+  }
 
   ///////////////////
   // Save on Local Storage
@@ -692,6 +748,11 @@ class App {
 
 const app = new App();
 
-// Alarm
+// notify update version
 
-// notification
+const message = `Đã update tính năng nhãn cho báo thức🎉⏰ (06/12/2022)
+Phần âm thanh khi báo thức thì chưa fix được ở các trình duyệt cho mobile (Thực ra là không biết fix) 😅
+Trong tương lai sẽ update thêm tính năng lặp lại của báo thức.🥱💪`;
+setTimeout(() => {
+  alert(message);
+}, 1000);
