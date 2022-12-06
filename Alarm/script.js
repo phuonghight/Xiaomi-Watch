@@ -185,8 +185,7 @@ class App {
             this.curIndex,
             $('.hourFixAddition').value,
             $('.minFixAddition').value,
-            false,
-            this.curLabel
+            false
           );
           this.curLabel = '';
 
@@ -663,11 +662,12 @@ class App {
     this._updateUI();
   }
 
-  _installFixAddition(id, hour, min, isRepeat = false, label = '') {
+  _installFixAddition(id, hour, min, isRepeat = false) {
     this.#listAlarm[id].hour = hour;
     this.#listAlarm[id].min = min;
     this.#listAlarm[id].isRepeat = isRepeat;
-    this.#listAlarm[id].label = label;
+    this.#listAlarm[id].isActive = true;
+    if (this.curLabel) this.#listAlarm[id].label = this.curLabel;
 
     this._setLocalStorage();
     this._updateUI();
